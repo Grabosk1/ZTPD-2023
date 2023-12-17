@@ -1,0 +1,203 @@
+--zad5
+for $book in doc("bib.xml")//book
+return 
+    for $author in $book/author
+    return
+        <last>{$author/last/text()}</last>
+
+--zad 6
+
+for $book in doc("bib.xml")//book
+return 
+    for $author in $book/author
+    return
+        <ksiazka>
+          <auhor>
+            <last>{$author/last/text()}</last>
+            <first>{$author/first/text()}</first>
+          </auhor>
+          <title>{$book/title/text()}</title>
+        </ksiazka>
+
+
+--7
+
+for $book in doc("bib.xml")//book
+return 
+    for $author in $book/author
+    return
+        <ksiazka>
+          <auhor>
+            {$author/last/text()}{$author/first/text()}
+          </auhor>
+          <title>{$book/title/text()}</title>
+        </ksiazka>
+
+--8
+
+for $book in doc("bib.xml")//book
+return 
+    for $author in $book/author
+    return
+        <ksiazka>
+        <autor>{concat($author/last/text(), ' ', $author/first/text())}</autor>
+
+          <title>{$book/title/text()}</title>
+        </ksiazka>
+
+
+
+--9
+<wynik>
+{for $book in doc("bib.xml")//book
+return 
+    for $author in $book/author
+    return
+        <ksiazka>
+        <autor>{concat($author/last/text(), ' ', $author/first/text())}</autor>
+
+          <title>{$book/title/text()}</title>
+        </ksiazka>}
+</wynik>
+
+--10
+<imiona>
+{for $book in doc("bib.xml")//book
+where $book/title =  "Data on the Web"
+return 
+    for $author in $book/author
+    return
+        <imie>{$author/first/text()}
+        </imie>}
+</imiona>
+
+--11 
+--where 
+for $book in doc("bib.xml")//book
+where $book/title =  "Data on the Web"
+return 
+    for $author in $book/author
+    return
+    <DataOnTheWeb>
+        {$book}</DataOnTheWeb>
+
+--scieżkowe
+<DataOnTheWeb>
+    {doc("bib.xml")//book[title='Data on the Web']}
+        </DataOnTheWeb>
+
+--12 
+<Data>
+{for $book in doc("bib.xml")//book
+where contains($book/title ,"Data")
+return 
+    for $author in $book/author
+    return
+        <nazwisko>{$author/last/text()}
+        </nazwisko>}
+</Data>
+--13
+<nazwiska>
+{for $book in doc("bib.xml")//book
+where contains($book/title ,"Data")
+return 
+  (<title>{$book/title/text()}</title>,
+    for $author in $book/author
+    return
+        <nazwisko>{$author/last/text()}
+        </nazwisko>)}
+</nazwiska>
+
+--14
+for $book in doc("bib.xml")//book
+let $author_count := $book/author
+where count($author_count) <= 2
+return 
+  <title>{$book/title}</title>
+
+--15
+for $book in doc("bib.xml")//book
+let $author_count := $book/author
+return 
+  <ksiazka>
+  
+  <title>{$book/title}</title>
+  <autorow>{count($author_count)}</autorow></ksiazka>
+
+--16
+<przedzial>{
+    let $years := doc("bib.xml")//book/@year/data()
+    let $minYear := min($years)
+    let $maxYear := max($years)
+    return concat($minYear, ' - ', $maxYear)
+}</przedzial>
+
+
+--17
+let $price := doc("bib.xml")//book/price
+let $minPrice := min($price)
+let $maxPrice := max($price)
+let $result :=$maxPrice - $minPrice 
+return
+<różnica>{$result}
+</różnica>
+
+
+--18
+<najtansze>{
+    let $minPrice := min(doc("bib.xml")//book/price/data())
+    for $book in doc("bib.xml")//book
+    where number($book/price) = $minPrice
+    return
+        <najtansza>
+            <title>{$book/title/text()}</title>
+            {
+                for $author in $book/author
+                return
+                    <author>
+                        <last>{$author/last/text()}</last>
+                        <first>{$author/first/text()}</first>
+                    </author>
+            }
+        </najtansza>
+}</najtansze>
+
+
+--19
+for $author in distinct-values(doc("bib.xml")//author/last)
+let $books := doc("bib.xml")//book[author/last = $author]
+return
+    <autor>{
+        <last>{$author}</last>,
+        for $book in $books
+        return <title>{$book/title/text()}</title>
+    }</autor>
+
+
+--20
+<wynik>
+{for $play in collection("shakespeare")//PLAY
+return
+    $play/TITLE
+}</wynik>
+
+--21
+for $play in collection("shakespeare")//PLAY
+where some $line in $play//LINE satisfies contains($line, "or not to be")
+return
+    $play/TITLE
+
+--22
+<wynik>
+{for $play in collection("shakespeare")//PLAY
+let $characters := $play//PERSONA
+let $acts := $play//ACT
+let $scenes := $play//SCENE
+return
+    <sztuka tytul="{$play/TITLE}">
+    <postaci>{count($characters)}</postaci>
+    <aktow>{count($acts)}</aktow>
+    <scen>{count($scenes)}</scen>
+    </sztuka>}
+</wynik>
+    
